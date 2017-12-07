@@ -1,9 +1,9 @@
 import { Dispatcher } from 'flux'
 import { getStore } from '../Actions/Actions'
 
-const Dispatcher = new Dispatcher()
+const AppDispatcher = new Dispatcher()
 
-Dispatcher.register((payload) => {
+AppDispatcher.register((payload) => {
 
     let action = payload.action
 

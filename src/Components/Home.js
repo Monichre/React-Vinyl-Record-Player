@@ -1,45 +1,46 @@
-import React, {Component} from 'react'
-import {Header} from './Partials/Header'
-
-
+import React, { Component } from 'react'
+import { Header } from './Partials/Header'
+import { Fullpage, Slide, HorizontalSlider } from 'fullpage-react'
+import {ParticlesBackground} from './Partials/Particles'
+import AlbumGallery from './Partials/AlbumGallery'
+import {CONSTANTS} from '../Constants'
 
 export default class Home extends Component {
+
+   
     render() {
 
+        const albums = this.props.data.albums
+        const fullPageOptions = {}
+        const horizontalSliderProps = {
+            name: 'horizontalSlider1', 
+            infinite: true, 
+          }
+
+        const horizontal_slides = this.props.data.sections.map((section, i) => (
+            <Slide className="slide" data-anchor={`slide${i + 1}`}>
+                {CONSTANTS.renderProperComponent(section)}
+            </Slide>
+        ))
+
+        horizontalSliderProps.slides = horizontal_slides
+        const full_page_slides = [ <HorizontalSlider {...horizontalSliderProps} />, <Slide><AlbumGallery albums={albums}/></Slide> ]
+        fullPageOptions.slides = full_page_slides
+
+        
         return (
             <div id="wrapper" className="animsition">
-                
-                <Header />
+                <Header albums={albums} />
                 <div id="inner">
                     <section className="behind-header">
-                        <div id="home-slider" className="titanSlider fh fw">
-                            <ul className="slides">
-                                {this.props.sections.map((section) => (
-                                    <li className="slide dark active">
-                                        <div className="hero fs">
-                                            <div className="bg faded"></div>
-                                            <div className="vcenter">
-                                            <div className="container">
-                                                <div className="grid">
-                                                <div className="col-1">2017</div>
-                                                <div className="col-7">
-                                                    <div className="label">January</div><a className="project-link">
-                                                    <h1 className="stripe animatedText">{section.fields.sectionTitle}</h1></a>
-                                                    <div className="label">Retouching</div>
-                                                    <div className="label">Art Direction</div>
-                                                </div>
-                                                </div>
-                                            </div>
-                                            </div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                            <div id="home-slider" className="">
+                                <ParticlesBackground />
+                                <Fullpage {...fullPageOptions} />
                             </div>
-                        </section>
-                    </div>
+                    </section>
                 </div>
-          
+            </div>
+
         )
     }
 }

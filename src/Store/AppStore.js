@@ -3,15 +3,15 @@ import _ from 'lodash'
 
 export default _.extend({}, EventEmitter.prototype, {
     data: {
-
+        ready: false
     },
-    emitChange: () => {
-        this.emitChange()
+    emitChange: function(){
+        this.emit('change')
     },
-    addEventListener: (callback) => {
+    addChangeListener: function(callback) {
         this.on('change', callback)
     },
-    removeChangeListener: (callback) => {
+    removeChangeListener: function(callback) {
         this.removeListener('change', callback)
     }
 
