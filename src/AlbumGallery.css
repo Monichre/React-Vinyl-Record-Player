@@ -52,7 +52,7 @@
 	list-style: none;
 }
 
-.js .grid::after {
+/* .js .album-grid ::after {
 	content: '';
 	position: absolute;
 	top: 150px;
@@ -65,7 +65,7 @@
 	border-radius: 50%;
 	-webkit-animation: spinLoader 1s linear infinite forwards;
 	animation: spinLoader 1s linear infinite forwards;
-}
+} */
 
 .js .grid--loaded::after {
 	display: none;
@@ -102,7 +102,7 @@
 }
 
 .js .grid__item {
-	position: absolute;
+	/* position: absolute; */
 	opacity: 0;
 	-webkit-transition: opacity 0.3s;
 	transition: opacity 0.3s;
@@ -310,7 +310,8 @@
 	pointer-events: none;
 	opacity: 0;
 	border-radius: 50%;
-	background: #45918e;
+	background: #eee;
+	transition: all .4s;
 	-webkit-transform: scale(0.001);
 	transform: scale(0.001);
 }
@@ -565,6 +566,20 @@
 .control-button--back,
 .controls .control-button {
 	opacity: 0;
+}
+
+.js .single--current .img-wrap--single {
+	opacity: 1;
+}
+.lp--single,
+.js .single--current .img-wrap--single,
+.js .single--current .number,
+.js .single--current .year--single,
+.js .single--current .artist--single,
+.js .single--current .title--single,
+.single--current .control-button--back,
+.single--current .controls .control-button {
+	opacity: 1;
 }
 
 .control-button--back,

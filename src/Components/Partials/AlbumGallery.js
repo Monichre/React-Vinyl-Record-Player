@@ -10,7 +10,8 @@ export default class AlbumGallery extends Component {
 
         this.state = {
             activeAlbum: null,
-            activeIndex: null
+            activeIndex: null,
+            viewSingle: false
         }
     }
     componentDidMount() {
@@ -40,13 +41,35 @@ export default class AlbumGallery extends Component {
     setActiveAlbum(album, index) {
         console.log(album)
         console.log(index)
+
+        document.querySelector('body').classList.add('js')
         
         this.setState({
             activeAlbum: {...album},
-            activeIndex: index
+            activeIndex: index,
+            viewSingle: true
+        })
+    }
+    closeActiveAlbum(e) {
+        e.preventDefault()
+        // document.querySelector('body').classList.remove('js')
+        this.setState({
+            viewSingle: false
         })
     }
     render() {
+    
+        let deco_expander_style
+
+        if(this.state.viewSingle) {
+            deco_expander_style = {
+                opacity: 1,
+                left: '334px',
+                top: '300px',
+                transform: 'matrix3d(1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1)'
+            }
+        }
+        
       
      const body = document.querySelector('body')
         let script = document.createElement('div')
@@ -171,7 +194,7 @@ export default class AlbumGallery extends Component {
                         </ul>
 
                     </div>
-                    <div className="deco-expander"></div>
+                    <div className="deco-expander" style={deco_expander_style}></div>
                     <div className="view view--player">
                             <button className="control-button control-button--back" aria-label="Back to album slideshow">
                                 <svg className="icon icon--arrow">
@@ -274,8 +297,8 @@ export default class AlbumGallery extends Component {
                                 </div>
                             </div>
                         </div>
-                    <div className="view view--single">
-                        <div className="single" id={this.state.activeIndex ? `album-${this.state.activeIndex}` : null} data-side1="mp3/Stolen_Dreams_Backing_Track.mp3,mp3/Dream_On_This_Side.mp3,mp3/Beautiful_Paranoia.mp3" data-side2="mp3/Rock_On.mp3,mp3/Old_Man_and_the_Sea_II.mp3,mp3/Dawn's_Battle.mp3">
+                    <div className={`view view--single ${this.state.viewSingle ? 'view--current' : ''}`}>
+                        <div className={`single ${this.state.viewSingle ? 'single--current' : ''}`} id={this.state.activeIndex ? `album-${this.state.activeIndex}` : null} data-side1="mp3/Stolen_Dreams_Backing_Track.mp3,mp3/Dream_On_This_Side.mp3,mp3/Beautiful_Paranoia.mp3" data-side2="mp3/Rock_On.mp3,mp3/Old_Man_and_the_Sea_II.mp3,mp3/Dawn's_Battle.mp3">
                             <div className="img-wrap img-wrap--single">
                                 <img className="img img--single" src={this.state.activeAlbum ? this.state.activeAlbum.fields.albumPhoto.fields.file.url : null} alt={this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''} />
                             </div>
@@ -284,7 +307,7 @@ export default class AlbumGallery extends Component {
                             <h3 className="title title--single">Blue Moments</h3>
                             <span className="year year--single">1999</span>
                         </div>
-                        <button className="control-button control-button--back" aria-label="Back to grid view">
+                        <button className="control-button control-button--back" aria-label="Back to grid view" onClick={this.closeActiveAlbum.bind(this)}>
                             <svg className="icon icon--arrow">
                                 <use xlinkHref="#icon-arrow"></use>
                             </svg>
