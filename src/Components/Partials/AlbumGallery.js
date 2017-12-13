@@ -200,7 +200,7 @@ export default class AlbumGallery extends Component {
                                             </svg>
                                             <img className="img img--grid" src={album.fields.albumPhoto.fields.file.url} alt="album1" />
                                         </div>
-                                        <span className="year">1999</span>
+                                        <span className="year"></span>
                                         <h3 className="title">{album.fields.albumTitle}</h3>
                                     </a>
                                 </li>
@@ -217,25 +217,25 @@ export default class AlbumGallery extends Component {
                             </button>
                             <div className="player-info">
                                 <h2 className="artist artist--player">Lena Glass</h2>
-                                <h3 className="title title--player">Blue Moments</h3>
-                                <span className="year year--player">1999</span>
+                                <h3 className="title title--player">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h3>
+                                <span className="year year--player"></span>
                             </div>
                             <div className="player-stand">
                                 <div className="visualizer"></div>
                                 <span className="song"></span>
                                 <div className="player__controls">
                                     <button className="player-button player-button--rotate" aria-label="Rotate LP">
-                                        <svg className="icon icon--rotate">
-                                            <use xlinkHref="#icon-rotate"></use>
-                                        </svg>
+                                        <div className="icon icon--rotate">
+                                            <i className="fa fa-lg fa-undo" aria-hidden="true"></i>
+                                        </div>
                                     </button>
                                     <button className="player-button player-button--playstop" aria-label="Play or Stop">
-                                        <svg className="icon icon--play icon--hidden">
-                                            <use xlinkHref="#icon-play"></use>
-                                        </svg>
-                                        <svg className="icon icon--stop">
-                                            <use xlinkHref="#icon-stop"></use>
-                                        </svg>
+                                        <div className="icon icon--play icon--hidden">
+                                            <i className="fa fa-lg fa-play-circle" aria-hidden="true"></i>
+                                        </div>
+                                        <div className="icon icon--stop">
+                                            <i className="fa fa-lg fa-stop-circle" aria-hidden="true"></i>
+                                        </div>
                                     </button>
                                 </div>
                             </div>
@@ -318,8 +318,8 @@ export default class AlbumGallery extends Component {
                             </div>
                             <span className="number">01<span className="number__total">12</span></span>
                             <h2 className="artist artist--single">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h2>
-                            <h3 className="title title--single">Blue Moments</h3>
-                            <span className="year year--single">1999</span>
+                            <h3 className="title title--single">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h3>
+                            <span className="year year--single"></span>
                         </div>
                         <div className="controls">
                             <button className="control-button control-button--play" aria-label="Play record" onClick={this.playThatRecord.bind(this)}>
@@ -327,9 +327,9 @@ export default class AlbumGallery extends Component {
                                     <circle cx="35" cy="35" r="24.15" />
                                     <path d="M35,7c15.5,0,28,12.5,28,28S50.5,63,35,63S7,50.5,7,35S19.5,7,35,7z"/>
                                 </svg>
-                                <svg className="icon icon--play">
-                                    <use xlinkHref="#icon-play"></use>
-                                </svg>
+                                <div className="icon icon--play">
+                                    <i className="fa fa-play-circle" aria-hidden="true"></i>
+                                </div>
                             </button>
                             <div className="controls__navigate">
                                 <button className="control-button control-button--next" aria-label="Next album">
