@@ -4,6 +4,7 @@ import classie from 'classie'
 import dynamics from 'dynamics.js'
 
 
+
 export default class AlbumGallery extends Component {
     constructor(props){
         super(props)
@@ -11,7 +12,8 @@ export default class AlbumGallery extends Component {
         this.state = {
             activeAlbum: null,
             activeIndex: null,
-            viewSingle: false
+            viewSingle: false,
+            playTheRecord: false
         }
     }
     componentDidMount() {
@@ -57,11 +59,17 @@ export default class AlbumGallery extends Component {
             viewSingle: false
         })
     }
+    playThatRecord() {
+        this.setState({
+            viewSingle: false,
+            playTheRecord: true
+        })
+    }
     render() {
     
         let deco_expander_style
 
-        if(this.state.viewSingle) {
+        if(this.state.viewSingle || this.state.playTheRecord) {
             deco_expander_style = {
                 opacity: 1,
                 left: '334px',
@@ -172,6 +180,12 @@ export default class AlbumGallery extends Component {
                                 <circle cx="400" cy="400" r="200" />
                             </g>
                         </symbol>
+                        <symbol id="icon-tonearm" viewBox="0 0 800 800">
+                            <path style={{fill: "#7979D8"}} d="M354.5,761.6l11.9,6.2c0,0,37.1-91.5,42.4-123.7c2.7-16.4-1.1-103.9-1.1-103.9V307.5h-14.7l-0.1,232.7c0,0,3.7,87.5,1.1,103.9C389,674.6,354.5,761.6,354.5,761.6z"/>
+                            <rect x="379.7" y="239.7" style={{fill:"#474283"}} width="40.7" height="67.8"/>
+                            <circle style={{fill:"#fff"}} cx="400" cy="400" r="22.6"/>
+                            <path style={{fill:"#fff"}} className="grabbable" d="M353,738.9l18.3-22.9l13.2,6.4l-6.2,28.7l-22.8,47.1c0,0-1.2,3.3-15.4-3.6c-11.2-5.4-10-8.7-10-8.7L353,738.9z"/>
+                        </symbol>
                     </defs>
                 </svg>
                 <main>
@@ -195,7 +209,7 @@ export default class AlbumGallery extends Component {
 
                     </div>
                     <div className="deco-expander" style={deco_expander_style}></div>
-                    <div className="view view--player">
+                    <div className={`view view--player ${this.state.playTheRecord ? 'view--current' : ''}`}>
                             <button className="control-button control-button--back" aria-label="Back to album slideshow">
                                 <svg className="icon icon--arrow">
                                     <use xlinkHref="#icon-arrow"></use>
@@ -306,6 +320,29 @@ export default class AlbumGallery extends Component {
                             <h2 className="artist artist--single">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h2>
                             <h3 className="title title--single">Blue Moments</h3>
                             <span className="year year--single">1999</span>
+                        </div>
+                        <div className="controls">
+                            <button className="control-button control-button--play" aria-label="Play record" onClick={this.playThatRecord.bind(this)}>
+                                <svg className="icon icon--progress" viewBox="0 0 70 70">
+                                    <circle cx="35" cy="35" r="24.15" />
+                                    <path d="M35,7c15.5,0,28,12.5,28,28S50.5,63,35,63S7,50.5,7,35S19.5,7,35,7z"/>
+                                </svg>
+                                <svg className="icon icon--play">
+                                    <use xlinkHref="#icon-play"></use>
+                                </svg>
+                            </button>
+                            <div className="controls__navigate">
+                                <button className="control-button control-button--next" aria-label="Next album">
+                                    <svg className="icon icon--next">
+                                        <use xlinkHref="#icon-next"></use>
+                                    </svg>
+                                </button>
+                                <button className="control-button control-button--prev" aria-label="Previous album">
+                                    <svg className="icon icon--prev">
+                                        <use xlinkHref="#icon-prev"></use>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <button className="control-button control-button--back" aria-label="Back to grid view" onClick={this.closeActiveAlbum.bind(this)}>
                             <svg className="icon icon--arrow">

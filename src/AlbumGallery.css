@@ -227,20 +227,29 @@
 }
 
 .title {
-	font-size: 1em;
-	font-weight: bold;
-	margin: 0 0 0 3em;
-	white-space: nowrap;
+	font-size: 2.5em;
+    font-weight: bold;
+    position: absolute;
+    top: -40px;
+    left: -40px;
+    background: black;
+    padding: 10px;
+    color: white;
+    text-transform: uppercase;
+    /* margin: 0 0 0 3em; */
+    text-decoration: none;
+    white-space: nowrap;
 }
 
 .year {
-	font-size: 0.85em;
+	font-size: 1.25em;
 	position: absolute;
 	z-index: 10;
 	right: 0;
 	margin: -1em -1em 0 0;
 	padding: 0.3em 0.5em;
 	color: #fff;
+	background: black;
 	border: 2px solid;
 	-webkit-transform: translate3d(0,0,0);
 	transform: translate3d(0,0,0);
@@ -381,6 +390,7 @@
 .artist--single,
 .title--single {
 	color: #fff;
+	background: black;
 	/**text-shadow: 1px 11px 3vmin rgba(0,0,0,0.3);*/
 }
 
@@ -514,6 +524,9 @@
 	-webkit-transition: opacity 0.3s;
 	transition: opacity 0.3s;
 }
+.icon-arrow {
+	height: 30px;
+}
 
 .control-button--active .icon--play {
 	opacity: 0;
@@ -541,7 +554,7 @@
 
 .control-button--play:hover .icon--progress circle,
 .control-button--play:focus .icon--progress circle {
-	fill: rgba(255,255,255,0.5);
+	fill: rgba(255,255,255,0.9);
 }
 
 .control-button--back {
@@ -578,7 +591,7 @@
 .js .single--current .artist--single,
 .js .single--current .title--single,
 .single--current .control-button--back,
-.single--current .controls .control-button {
+.single--current .controls .control-button, .view--current .controls .control-button, .view--current .controls .control-button--play {
 	opacity: 1;
 }
 
@@ -715,6 +728,7 @@
 .view--current .player__element--lp {
 	-webkit-transition: -webkit-transform 1s;
 	transition: transform 1s;
+	opacity: 1;
 }
 
 .player__element--lp-flip {
@@ -913,7 +927,9 @@ we use margins because transforms will be applied dynamically */
 .icon--touchthrough {
 	pointer-events: none;
 }
-
+.icon--arrow {
+	height: 30px;
+}
 
 /* Initially hidden elements of the player */
 
