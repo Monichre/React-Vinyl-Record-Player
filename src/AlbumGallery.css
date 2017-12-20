@@ -319,11 +319,30 @@
 	pointer-events: none;
 	opacity: 0;
 	border-radius: 50%;
-	background: #eee;
+	background-color: #FFDEE9;
+	background-image: linear-gradient(0deg, #FFDEE9 0%, #B5FFFC 100%);
 	transition: all .4s;
 	-webkit-transform: scale(0.001);
 	transform: scale(0.001);
 }
+
+.deco-expander:before {
+	filter: blur(5px);
+	height: 100%;
+	width: 100%;
+	top: 0; left: 0;
+	position: fixed;
+	/* z-index: -1; */
+	display: block;
+	-webkit-filter: blur(50px);
+	-moz-filter: blur(50px);
+	-o-filter: blur(50px);
+	-ms-filter: blur(50px);
+	filter: blur(50px);
+	opacity: 1;
+	content: ' ';
+}
+
 
 
 /* Single LP view */
@@ -851,6 +870,7 @@ we use margins because transforms will be applied dynamically */
 .view--current .player__controls {
 	pointer-events: auto;
 }
+
 
 .player-button {
     position: relative;

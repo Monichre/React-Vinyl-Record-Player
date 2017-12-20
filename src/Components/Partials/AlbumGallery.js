@@ -75,7 +75,7 @@ export default class AlbumGallery extends Component {
 
         if (this.state.viewSingle || this.state.playTheRecord) {
             deco_expander_style = {
-                opacity: 1,
+                opacity: .9,
                 left: '334px',
                 top: '300px',
                 transform: 'matrix3d(1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1)'
