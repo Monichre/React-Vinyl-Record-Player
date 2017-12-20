@@ -2,42 +2,102 @@ import React, { Component } from 'react'
 import '../../AlbumGallery.css'
 import classie from 'classie'
 import dynamics from 'dynamics.js'
+import imagesLoaded from 'imagesloaded'
+import Masonry from 'masonry-layout'
+
+window.AudioContext = window.AudioContext||window.webkitAudioContext;
+
+let filesLoaded = 0
+let numberOfFiles = 0
+let context = new AudioContext()
+let buffers = []
+
+const AbbeyLoad = (files, callback, onProgress)  => {
+    console.log(this.files)
+    this.files = files || {}; 
+    filesLoaded = 0;
+    numberOfFiles = 0;
+    loadFiles(this.files, callback, onProgress);
+}
+
+AbbeyLoad.size = (obj) => {
+
+    let size = 0;
+    for (let key in obj) {
+
+        if (obj.hasOwnProperty(key)){
+            size++;
+        }
+    }
+    return size;
+};
+
+const loadFile = (fileKey, file, returnObj, callback, onProgress) => {
+    const request = new XMLHttpRequest();
+
+    request.open('GET', file[fileKey], true);
+    request.responseType = 'arraybuffer';
+
+    request.onload = function () {        	
+        filesLoaded++;
+        context.decodeAudioData(request.response, function (decodedBuffer) {
+            returnObj[fileKey] = decodedBuffer;
+            if( typeof onProgress === 'function' ) {
+                onProgress(AbbeyLoad.size(returnObj)*100/numberOfFiles);
+            }
+            if (AbbeyLoad.size(returnObj) === numberOfFiles) {
+                callback(returnObj);
+            }
+        })
+    }
+
+    request.send();
+}
+
+const loadFiles = (files, callback, onProgress) => {
+    const returnObj = {};
+
+    files.forEach(function (file, index) {
+
+        numberOfFiles = AbbeyLoad.size(file);
+
+        for (const key in file) {
+            if (file.hasOwnProperty(key)) {
+                loadFile(key, file, returnObj, callback, onProgress);
+            }
+        }
+
+    })
+}
+
+window.AbbeyLoad = AbbeyLoad;
 
 
 
 export default class AlbumGallery extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
 
         this.state = {
             activeAlbum: null,
+            activeSongs: [],
             activeIndex: null,
             viewSingle: false,
             playTheRecord: false
         }
     }
+
+	loadTurntableAssets(callback) {
+        const _this = this
+		new AbbeyLoad([_this.state.activeSongs], function(bufferList) {
+			if( typeof callback === 'function' ) {
+				callback(bufferList);
+			}
+		});
+	};
     componentDidMount() {
 
-        const body = document.querySelector('body')
-        const scripts = []
-
-        let script_1 = document.createElement('script')
-        script_1.setAttribute('src', 'js/imagesloaded.pkgd.min.js')
-        scripts.push(script_1)
-        let script_2 = document.createElement('script')
-        script_2.setAttribute('src', 'js/masonry.pkgd.min.js')
-        scripts.push(script_2)
-        let script_3 = document.createElement('script')
-        script_3.setAttribute('src', 'js/classie.js')
-        scripts.push(script_3)
-        let script_4 = document.createElement('script')
-        script_4.setAttribute('src', 'js/dynamics.min.js')
-        scripts.push(script_4)
-        let script_5 = document.createElement('script')
-        script_5.setAttribute('src', 'js/abbey-load.js')
-        scripts.push(script_5)
-
-        scripts.forEach((script) => body.appendChild(script))
+       
 
     }
     setActiveAlbum(album, index) {
@@ -45,11 +105,12 @@ export default class AlbumGallery extends Component {
         console.log(index)
 
         document.querySelector('body').classList.add('js')
-        
+
         this.setState({
-            activeAlbum: {...album},
+            activeAlbum: { ...album },
             activeIndex: index,
-            viewSingle: true
+            viewSingle: true,
+            activeSongs: album.songs
         })
     }
     closeActiveAlbum(e) {
@@ -65,11 +126,14 @@ export default class AlbumGallery extends Component {
             playTheRecord: true
         })
     }
+    playThatSong() {
+
+    }
     render() {
-    
+
         let deco_expander_style
 
-        if(this.state.viewSingle || this.state.playTheRecord) {
+        if (this.state.viewSingle || this.state.playTheRecord) {
             deco_expander_style = {
                 opacity: 1,
                 left: '334px',
@@ -77,13 +141,17 @@ export default class AlbumGallery extends Component {
                 transform: 'matrix3d(1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1)'
             }
         }
-        
-      
-     const body = document.querySelector('body')
+
+
+        const body = document.querySelector('body')
         let script = document.createElement('div')
         script.setAttribute('src', 'js/main.js')
         body.appendChild(script)
-        
+        console.log(this.state.activeAlbum)
+
+
+
+
         return (
             <div className="AlbumGallery">
                 <svg className="hidden">
@@ -113,9 +181,9 @@ export default class AlbumGallery extends Component {
                             <path d="M17.6,2.9c1.5,1.4,2.2,3.4,2.2,5.2c0,1.2-0.3,2.4-0.9,3.5l-1.2-1.2C18,9.7,18.1,9,18.1,8.1c0-1.5-0.6-3-1.7-4.1c-2.2-2.2-5.9-2.2-8.1,0C7.2,5.2,6.6,6.7,6.6,8.1h2.7l-3.5,3.5L2.3,8.1h2.7c0-1.9,0.7-3.8,2.2-5.2h0C10,0,14.7,0,17.6,2.9z M23,17c0,2.9-4.9,5.3-11,5.3c-6.1,0-11-2.4-11-5.3s4.9-5.3,11-5.3C18.1,11.7,23,14.1,23,17z M14.6,16.8c0-0.6-1.2-1-2.6-1s-2.6,0.5-2.6,1s1.2,1,2.6,1S14.6,17.4,14.6,16.8z" />
                         </symbol>
                         <symbol id="icon-effect" viewBox="0 0 24 24">
-                            <path d="M12,10.5c-6.1,0-11,2.4-11,5.3s4.9,5.3,11,5.3c6.1,0,11-2.4,11-5.3S18.1,10.5,12,10.5z M12,16.6c-1.4,0-2.6-0.5-2.6-1c0-0.6,1.2-1,2.6-1s2.6,0.5,2.6,1C14.6,16.2,13.4,16.6,12,16.6z"/>
-					<path d="M19,2.9h0.4v4.7c0,0.6-0.6,1-1.4,1c-0.8,0-1.4-0.5-1.4-1s0.6-1,1.4-1c0.4,0,0.8,0.1,1,0.3V4.5l-3.2,0.7v3.1c0,0.6-0.6,1-1.4,1c-0.8,0-1.4-0.5-1.4-1s0.6-1,1.4-1c0.4,0,0.8,0.1,1,0.3v-4L19,2.9z"/>
-					<polygon style={{stroke:'#FFFFFF', strokeWidth:0.5, strokeMiterLimit:10}} points="6.1,13.6 3.8,3.9 7.6,3.6" />
+                            <path d="M12,10.5c-6.1,0-11,2.4-11,5.3s4.9,5.3,11,5.3c6.1,0,11-2.4,11-5.3S18.1,10.5,12,10.5z M12,16.6c-1.4,0-2.6-0.5-2.6-1c0-0.6,1.2-1,2.6-1s2.6,0.5,2.6,1C14.6,16.2,13.4,16.6,12,16.6z" />
+                            <path d="M19,2.9h0.4v4.7c0,0.6-0.6,1-1.4,1c-0.8,0-1.4-0.5-1.4-1s0.6-1,1.4-1c0.4,0,0.8,0.1,1,0.3V4.5l-3.2,0.7v3.1c0,0.6-0.6,1-1.4,1c-0.8,0-1.4-0.5-1.4-1s0.6-1,1.4-1c0.4,0,0.8,0.1,1,0.3v-4L19,2.9z" />
+                            <polygon style={{ stroke: '#FFFFFF', strokeWidth: 0.5, strokeMiterLimit: 10 }} points="6.1,13.6 3.8,3.9 7.6,3.6" />
                         </symbol>
                         <symbol id="icon-drop" viewBox="0 0 32 32">
                             <title>drop</title>
@@ -124,7 +192,7 @@ export default class AlbumGallery extends Component {
                         </symbol>
                         <symbol id="icon-vinyls" viewBox="0 0 32 32">
                             <title>vinyls</title>
-                            <g style={{fill: "#933ec5"}}>
+                            <g style={{ fill: "#933ec5" }}>
                                 <path d="M31.865 8.475l-0.194-0.206h-0.979l0.218-1.781c0.023-0.226-0.052-0.452-0.204-0.62s-0.37-0.265-0.597-0.265h-1.299v-1.871c0-0.438-0.357-0.794-0.795-0.794h-1.338v-1.871c0-0.438-0.357-0.794-0.795-0.794h-19.737c-0.438 0-0.794 0.357-0.794 0.794v1.871h-1.338c-0.438 0-0.794 0.357-0.794 0.794v1.871h-1.299c-0.227 0-0.445 0.097-0.597 0.265s-0.227 0.394-0.202 0.632l0.216 1.769h-0.73c-0.171 0-0.332 0.075-0.443 0.206l-0.163 0.219 3.177 22.316c0.074 0.416 0.433 0.719 0.856 0.719h23.961c0.422 0 0.782-0.301 0.859-0.736l3.138-22.047c0.030-0.168-0.017-0.34-0.126-0.47zM6.417 1.338h19.194v1.599h-19.194v-1.599zM4.284 4.004h23.459v1.599h-23.459v-1.599zM2.214 6.67h27.599l-0.196 1.599h-27.207l-0.196-1.599zM27.824 30.662h-23.619l-3.036-21.326h29.691l-3.035 21.326z"></path>
                                 <path d="M15.747 10.935c-6.027 0-10.93 4.066-10.93 9.064s4.903 9.064 10.93 9.064 10.93-4.066 10.93-9.064-4.903-9.064-10.93-9.064zM15.747 27.996c-5.439 0-9.863-3.588-9.863-7.997s4.425-7.997 9.863-7.997 9.863 3.588 9.863 7.997-4.425 7.997-9.863 7.997z"></path>
                                 <path d="M16.28 13.568c0-0.295-0.238-0.533-0.533-0.533-2.129 0-4.147 0.645-5.836 1.866-0.238 0.172-0.292 0.505-0.12 0.744 0.104 0.145 0.267 0.221 0.433 0.221 0.108 0 0.217-0.033 0.312-0.101 1.506-1.088 3.308-1.663 5.211-1.663 0.295 0 0.533-0.238 0.533-0.533z"></path>
@@ -181,10 +249,10 @@ export default class AlbumGallery extends Component {
                             </g>
                         </symbol>
                         <symbol id="icon-tonearm" viewBox="0 0 800 800">
-                            <path style={{fill: "#7979D8"}} d="M354.5,761.6l11.9,6.2c0,0,37.1-91.5,42.4-123.7c2.7-16.4-1.1-103.9-1.1-103.9V307.5h-14.7l-0.1,232.7c0,0,3.7,87.5,1.1,103.9C389,674.6,354.5,761.6,354.5,761.6z"/>
-                            <rect x="379.7" y="239.7" style={{fill:"#474283"}} width="40.7" height="67.8"/>
-                            <circle style={{fill:"#fff"}} cx="400" cy="400" r="22.6"/>
-                            <path style={{fill:"#fff"}} className="grabbable" d="M353,738.9l18.3-22.9l13.2,6.4l-6.2,28.7l-22.8,47.1c0,0-1.2,3.3-15.4-3.6c-11.2-5.4-10-8.7-10-8.7L353,738.9z"/>
+                            <path style={{ fill: "#000" }} d="M354.5,761.6l11.9,6.2c0,0,37.1-91.5,42.4-123.7c2.7-16.4-1.1-103.9-1.1-103.9V307.5h-14.7l-0.1,232.7c0,0,3.7,87.5,1.1,103.9C389,674.6,354.5,761.6,354.5,761.6z" />
+                            <rect x="379.7" y="239.7" style={{ fill: "#000" }} width="40.7" height="67.8" />
+                            <circle style={{ fill: "#fff" }} cx="400" cy="400" r="22.6" />
+                            <path style={{ fill: "#fff" }} className="grabbable" d="M353,738.9l18.3-22.9l13.2,6.4l-6.2,28.7l-22.8,47.1c0,0-1.2,3.3-15.4-3.6c-11.2-5.4-10-8.7-10-8.7L353,738.9z" />
                         </symbol>
                     </defs>
                 </svg>
@@ -210,38 +278,40 @@ export default class AlbumGallery extends Component {
                     </div>
                     <div className="deco-expander" style={deco_expander_style}></div>
                     <div className={`view view--player ${this.state.playTheRecord ? 'view--current' : ''}`}>
-                            <button className="control-button control-button--back" aria-label="Back to album slideshow">
-                                <svg className="icon icon--arrow">
-                                    <use xlinkHref="#icon-arrow"></use>
-                                </svg>
-                            </button>
-                            <div className="player-info">
-                                <h2 className="artist artist--player">Lena Glass</h2>
-                                <h3 className="title title--player">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h3>
-                                <span className="year year--player"></span>
+                        <button className="control-button control-button--back" aria-label="Back to album slideshow">
+                            <svg className="icon icon--arrow">
+                                <use xlinkHref="#icon-arrow"></use>
+                            </svg>
+                        </button>
+
+                        <div className="player-info">
+                            <h2 className="artist artist--player">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h2>
+                            <h3 className="title title--player">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h3>
+                            <span className="year year--player"></span>
+                        </div>
+                        <div className="player-stand">
+                            <div className="visualizer"></div>
+                            <span className="song"></span>
+                            <div className="player__controls">
+                                <button className="player-button player-button--rotate" aria-label="Rotate LP">
+                                    <div className="icon icon--rotate">
+                                        <i className="fa fa-2x fa-undo" aria-hidden="true"></i>
+                                    </div>
+                                </button>
+                                <button className="player-button player-button--playstop" aria-label="Play or Stop">
+                                    <div className="icon icon--play icon--hidden">
+                                        <i className="fa fa-2x fa-play-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <div className="icon icon--stop">
+                                        <i className="fa fa-2x fa-stop-circle" aria-hidden="true"></i>
+                                    </div>
+                                </button>
                             </div>
-                            <div className="player-stand">
-                                <div className="visualizer"></div>
-                                <span className="song"></span>
-                                <div className="player__controls">
-                                    <button className="player-button player-button--rotate" aria-label="Rotate LP">
-                                        <div className="icon icon--rotate">
-                                            <i className="fa fa-lg fa-undo" aria-hidden="true"></i>
-                                        </div>
-                                    </button>
-                                    <button className="player-button player-button--playstop" aria-label="Play or Stop">
-                                        <div className="icon icon--play icon--hidden">
-                                            <i className="fa fa-lg fa-play-circle" aria-hidden="true"></i>
-                                        </div>
-                                        <div className="icon icon--stop">
-                                            <i className="fa fa-lg fa-stop-circle" aria-hidden="true"></i>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="player">
+                        </div>
+                        <div className="player">
                             <div className="player__element player__element--lp">
                                 <div className="player__element-inner">
+
                                     <svg className="player__svg-lp" viewBox="0 0 800 800">
                                         <title>LP</title>
                                         <path fill="#181819" d="M400,1C179.6,1,1,179.6,1,400s178.6,399,399,399s399-178.6,399-399S620.4,1,400,1zM400,409.8c-5.4,0-9.8-4.4-9.8-9.8s4.4-9.8,9.8-9.8s9.8,4.4,9.8,9.8S405.4,409.8,400,409.8z" />
@@ -272,9 +342,9 @@ export default class AlbumGallery extends Component {
                                                 <path fill="#4bb749" d="M400,262.1c-76.1,0-137.9,61.7-137.9,137.9S323.9,537.9,400,537.9S537.9,476.1,537.9,400S476.1,262.1,400,262.1z M400,411.7c-6.4,0-11.7-5.2-11.7-11.7s5.2-11.7,11.7-11.7s11.7,5.2,11.7,11.7S406.4,411.7,400,411.7z" />
                                             </clipPath>
                                         </defs>
-                                        <image xlinkHref="img/album11.jpg" x="250" y="250" height="300px" width="300px" clipPath="url(#coverClip)" />
-                                        <text className="lp-side-label lp-side-label--a" transform="matrix(1 0 0 1 381.8867 509.8047)" style={{opacity:0.2, fontFamily:'Arial', fontSize:"50.4557px"}}>A</text>
-                                        <text className="lp-side-label lp-side-label--b" transform="matrix(-1 0 0 1 418.2188 509.8047)" style={{opacity:0.2, fontFamily:'Arial', fontSize:"50.4557px"}}>B</text>
+                                        <image xlinkHref={this.state.activeAlbum ? this.state.activeAlbum.fields.albumPhoto.fields.file.url : null} x="250" y="250" height="300px" width="300px" clipPath="url(#coverClip)" />
+                                        <text className="lp-side-label lp-side-label--a" transform="matrix(1 0 0 1 381.8867 509.8047)" style={{ opacity: 0.2, fontFamily: 'Arial', fontSize: "50.4557px" }}>A</text>
+                                        <text className="lp-side-label lp-side-label--b" transform="matrix(-1 0 0 1 418.2188 509.8047)" style={{ opacity: 0.2, fontFamily: 'Arial', fontSize: "50.4557px" }}>B</text>
                                     </svg>
                                 </div>
                             </div>
@@ -283,34 +353,36 @@ export default class AlbumGallery extends Component {
                                     <use xlinkHref="#icon-tonearm"></use>
                                 </svg>
                             </div>
+
+
                         </div>
                         <div className="effects">
 
-                                <button className="effects__button effects__button--vinyleffect effects__button--active" aria-label="Toggle Vinyl effect">
-                                    <svg className="icon icon--effect">
-                                        <use xlinkHref="#icon-effect"></use>
+                            <button className="effects__button effects__button--vinyleffect effects__button--active" aria-label="Toggle Vinyl effect">
+                                <svg className="icon icon--effect">
+                                    <use xlinkHref="#icon-effect"></use>
+                                </svg>
+                            </button>
+
+                            <div className="effects__irs">
+                                <button className="effects__button">
+                                    <svg className="icon icon--touchthrough icon--ir-cathedral">
+                                        <use xlinkHref="#icon-ir-cathedral"></use>
                                     </svg>
                                 </button>
-
-                                <div className="effects__irs">
-                                    <button className="effects__button">
-                                        <svg className="icon icon--touchthrough icon--ir-cathedral">
-                                            <use xlinkHref="#icon-ir-cathedral"></use>
-                                        </svg>
-                                    </button>
-                                    <button className="effects__button">
-                                        <svg className="icon icon--touchthrough icon--ir-acoustic">
-                                            <use xlinkHref="#icon-ir-acoustic"></use>
-                                        </svg>
-                                    </button>
-                                    <button className="effects__button">
-                                        <svg className="icon icon--touchthrough icon--ir-stadium">
-                                            <use xlinkHref="#icon-ir-stadium"></use>
-                                        </svg>
-                                    </button>
-                                </div>
+                                <button className="effects__button">
+                                    <svg className="icon icon--touchthrough icon--ir-acoustic">
+                                        <use xlinkHref="#icon-ir-acoustic"></use>
+                                    </svg>
+                                </button>
+                                <button className="effects__button">
+                                    <svg className="icon icon--touchthrough icon--ir-stadium">
+                                        <use xlinkHref="#icon-ir-stadium"></use>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
+                    </div>
                     <div className={`view view--single ${this.state.viewSingle ? 'view--current' : ''}`}>
                         <div className={`single ${this.state.viewSingle ? 'single--current' : ''}`} id={this.state.activeIndex ? `album-${this.state.activeIndex}` : null} data-side1="mp3/Stolen_Dreams_Backing_Track.mp3,mp3/Dream_On_This_Side.mp3,mp3/Beautiful_Paranoia.mp3" data-side2="mp3/Rock_On.mp3,mp3/Old_Man_and_the_Sea_II.mp3,mp3/Dawn's_Battle.mp3">
                             <div className="img-wrap img-wrap--single">
@@ -325,10 +397,10 @@ export default class AlbumGallery extends Component {
                             <button className="control-button control-button--play" aria-label="Play record" onClick={this.playThatRecord.bind(this)}>
                                 <svg className="icon icon--progress" viewBox="0 0 70 70">
                                     <circle cx="35" cy="35" r="24.15" />
-                                    <path d="M35,7c15.5,0,28,12.5,28,28S50.5,63,35,63S7,50.5,7,35S19.5,7,35,7z"/>
+                                    <path d="M35,7c15.5,0,28,12.5,28,28S50.5,63,35,63S7,50.5,7,35S19.5,7,35,7z" />
                                 </svg>
                                 <div className="icon icon--play">
-                                    <i className="fa fa-play-circle" aria-hidden="true"></i>
+                                    <i className="fa fa-2x fa-play-circle" aria-hidden="true"></i>
                                 </div>
                             </button>
                             <div className="controls__navigate">
@@ -351,7 +423,7 @@ export default class AlbumGallery extends Component {
                         </button>
                     </div>
 
-                    
+
 
 
                 </main>

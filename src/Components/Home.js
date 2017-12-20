@@ -7,6 +7,10 @@ import {CONSTANTS} from '../Constants'
 
 export default class Home extends Component {
 
+    componentDidMount() {
+
+    }
+
    
     render() {
 
