@@ -1,77 +1,6 @@
 import React, { Component } from 'react'
 import '../../AlbumGallery.css'
-import classie from 'classie'
-import dynamics from 'dynamics.js'
-import imagesLoaded from 'imagesloaded'
-import Masonry from 'masonry-layout'
-
-window.AudioContext = window.AudioContext||window.webkitAudioContext;
-
-let filesLoaded = 0
-let numberOfFiles = 0
-let context = new AudioContext()
-let buffers = []
-
-const AbbeyLoad = (files, callback, onProgress)  => {
-    console.log(this.files)
-    this.files = files || {}; 
-    filesLoaded = 0;
-    numberOfFiles = 0;
-    loadFiles(this.files, callback, onProgress);
-}
-
-AbbeyLoad.size = (obj) => {
-
-    let size = 0;
-    for (let key in obj) {
-
-        if (obj.hasOwnProperty(key)){
-            size++;
-        }
-    }
-    return size;
-};
-
-const loadFile = (fileKey, file, returnObj, callback, onProgress) => {
-    const request = new XMLHttpRequest();
-
-    request.open('GET', file[fileKey], true);
-    request.responseType = 'arraybuffer';
-
-    request.onload = function () {        	
-        filesLoaded++;
-        context.decodeAudioData(request.response, function (decodedBuffer) {
-            returnObj[fileKey] = decodedBuffer;
-            if( typeof onProgress === 'function' ) {
-                onProgress(AbbeyLoad.size(returnObj)*100/numberOfFiles);
-            }
-            if (AbbeyLoad.size(returnObj) === numberOfFiles) {
-                callback(returnObj);
-            }
-        })
-    }
-
-    request.send();
-}
-
-const loadFiles = (files, callback, onProgress) => {
-    const returnObj = {};
-
-    files.forEach(function (file, index) {
-
-        numberOfFiles = AbbeyLoad.size(file);
-
-        for (const key in file) {
-            if (file.hasOwnProperty(key)) {
-                loadFile(key, file, returnObj, callback, onProgress);
-            }
-        }
-
-    })
-}
-
-window.AbbeyLoad = AbbeyLoad;
-
+import Sound from 'react-sound'
 
 
 export default class AlbumGallery extends Component {
@@ -79,21 +8,20 @@ export default class AlbumGallery extends Component {
         super(props)
 
         this.state = {
+            counter: 0,
             activeAlbum: null,
-            activeSongs: [],
+            activeSong: null,
+            activeAlbumSongs: [],
             activeIndex: null,
             viewSingle: false,
-            playTheRecord: false
+            playTheRecord: false,
+            activeSongIs_: 'STOPPED'
         }
     }
 
 	loadTurntableAssets(callback) {
-        const _this = this
-		new AbbeyLoad([_this.state.activeSongs], function(bufferList) {
-			if( typeof callback === 'function' ) {
-				callback(bufferList);
-			}
-		});
+        
+	
 	};
     componentDidMount() {
 
@@ -102,20 +30,18 @@ export default class AlbumGallery extends Component {
     }
     setActiveAlbum(album, index) {
         console.log(album)
-        console.log(index)
-
+        
         document.querySelector('body').classList.add('js')
 
         this.setState({
             activeAlbum: { ...album },
             activeIndex: index,
             viewSingle: true,
-            activeSongs: album.songs
+            activeAlbumSongs: album.fields.songs
         })
     }
     closeActiveAlbum(e) {
         e.preventDefault()
-        // document.querySelector('body').classList.remove('js')
         this.setState({
             viewSingle: false
         })
@@ -127,7 +53,21 @@ export default class AlbumGallery extends Component {
         })
     }
     playThatSong() {
+        this.setState({
+            activeSongIs_: 'PLAYING'
+        })
+    }
+    nextSong() {
 
+    }
+    previousSong() {
+
+    }
+    handleSongLoading(e) {
+        console.log(e)
+    }
+    handleSongPlaying(e) {
+        console.log(e)
     }
     render() {
 
@@ -142,15 +82,7 @@ export default class AlbumGallery extends Component {
             }
         }
 
-
-        const body = document.querySelector('body')
-        let script = document.createElement('div')
-        script.setAttribute('src', 'js/main.js')
-        body.appendChild(script)
         console.log(this.state.activeAlbum)
-
-
-
 
         return (
             <div className="AlbumGallery">
@@ -299,7 +231,7 @@ export default class AlbumGallery extends Component {
                                     </div>
                                 </button>
                                 <button className="player-button player-button--playstop" aria-label="Play or Stop">
-                                    <div className="icon icon--play icon--hidden">
+                                    <div className="icon icon--play icon--hidden" onClick={this.playThatSong.bind(this)}>
                                         <i className="fa fa-2x fa-play-circle" aria-hidden="true"></i>
                                     </div>
                                     <div className="icon icon--stop">
@@ -353,7 +285,14 @@ export default class AlbumGallery extends Component {
                                     <use xlinkHref="#icon-tonearm"></use>
                                 </svg>
                             </div>
-
+                            <Sound
+                                url={this.state.activeAlbumSongs.length > 0 ? this.state.activeAlbumSongs[this.state.counter].fields.audioFile.fields.file.url : null}
+                                playStatus={this.state.activeSongIs_}
+                                playFromPosition={0}
+                                onLoading={(() => console.log(this))}
+                                onPlaying={this.handleSongPlaying.bind(this)}
+                                onFinishedPlaying={this.handleSongFinishedPlaying}
+                                />
 
                         </div>
                         <div className="effects">

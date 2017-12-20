@@ -12,13 +12,10 @@
     "lodash": "^4.17.4",
     "masonry-layout": "^4.2.0",
     "react": "^16.1.1",
-    "react-cl-audio-player": "^2.0.0",
     "react-dom": "^16.1.1",
-    "react-masonry-component": "^6.0.1",
     "react-particles-js": "^2.1.0",
     "react-router-dom": "^4.2.2",
-    "semantic-ui-css": "^2.2.12",
-    "semantic-ui-react": "^0.77.0"
+    "react-sound": "^0.10.0"
   },
   "devDependencies": {
     "react-scripts": "1.0.17"
