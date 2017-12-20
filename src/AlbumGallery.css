@@ -1,3 +1,9 @@
+@font-face {
+	font-family: "Blackout";
+	src: url("/blackout.ttf") format("ttf");
+		   
+   }
+
 
 .js .view {
 	pointer-events: none;
@@ -248,9 +254,8 @@
 	right: 0;
 	margin: -1em -1em 0 0;
 	padding: 0.3em 0.5em;
-	color: #fff;
-	background: black;
-	border: 2px solid;
+	
+	border: 3px solid black;
 	-webkit-transform: translate3d(0,0,0);
 	transform: translate3d(0,0,0);
 }
@@ -406,9 +411,8 @@
 	margin: 10vmin auto 3em;
 }
 
-.number,
-.artist--single,
-.title--single {
+
+.artist--single {
 	color: #fff;
 	background: black;
 	/**text-shadow: 1px 11px 3vmin rgba(0,0,0,0.3);*/
@@ -420,9 +424,9 @@
 	position: absolute;
 }
 
-.number,
+
 .artist--single {
-	font-family: 'nexa_boldregular', sans-serif;
+	padding: 20px;
 }
 
 .number {
@@ -430,11 +434,13 @@
 	top: -5vmin;
 	left: -6vmin;
 	white-space: nowrap;
+	font-family: "Blackout";
 }
 
 .number__total {
 	font-size: 7vmin;
 	vertical-align: top;
+	font-family: "Blackout";
 }
 
 .number__total::before {
@@ -457,18 +463,27 @@
 	top: 100%;
 	left: 5vmin;
 	margin: 0.25em 0 0;
+	font-family: "Blackout";
+}
+
+.title.title--single {
+	background: transparent;
+	color: black;
+	font-size: 4vmin;
 }
 
 .year--single {
 	font-size: 3vmin;
 	margin: 0;
-	color: #fff;
+	color: black;
 	border-width: 0.5vmin;
+	font-family: "Blackout";
 }
 
 .js .year--single {
 	top: -1em;
 	right: -5vmin;
+	font-family: "Blackout";
 }
 
 .no-js .year--single {
