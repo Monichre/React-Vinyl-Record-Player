@@ -479,6 +479,9 @@
 	border-width: 0.5vmin;
 	font-family: "Blackout";
 }
+.single--current .number, .single--current .number__total{
+	color: white;
+}
 
 .js .year--single {
 	top: -1em;
@@ -670,7 +673,7 @@
 	top: 50%;
 	left: 50%;
 	width: calc(90vmin + (0.2 * 80vmin));
-	height: 90vmin;
+	height: 100vmin;
 	border-radius: 0.15em;
 	border: 1px solid #ddd;
 	background: #eee;
@@ -689,13 +692,62 @@
 }
 
 .song {
-	font-size: 0.7em;
+	font-size: 4vmin;
+	line-height: 0.8;
+	margin: 0 0 0.25em 0;
+	white-space: nowrap;
+	background: black;
+    padding: 10px;
+    color: white;
+    text-transform: uppercase;
 	position: absolute;
 	top: calc(38px + 2.5vmin);
 	right: 4vmin;
 	max-width: calc(50vw - 4vmin);
 	text-align: right;
 }
+.song_list {
+	position: absolute;
+    top: 50px;
+    right: -200px;
+}
+.song_list_inner {
+	background: white;
+	padding: 80px 20px 10px;
+	position: absolute;
+    top: 0;
+    right: -100px;
+}
+
+.song_list h3 {
+	font-size: 6vmin;
+	line-height: 0.8;
+	white-space: nowrap;
+	background: black;
+	padding: 10px 30px;
+	position: relative;
+	z-index: 10;
+    color: white;
+    text-transform: uppercase;
+}
+.song_list .song_list_inner p {
+	font-family: "Blackout";
+	color: black;
+	position: relative;
+	line-height: normal;
+	font-size: 3vmin;
+	text-align: center;
+}
+/* .song_list p::before {
+	position: absolute;
+	content: '.';
+	left: -5px;
+	top: 2px;
+	line-height: 0;
+	
+	color: black;
+} */
+
 
 .player-info {
 	position: absolute;
@@ -712,14 +764,14 @@
 }
 
 .artist--player {
-	font-family: 'nexa_boldregular', sans-serif;
-}
-
-.artist--player {
 	font-size: 8vmin;
 	line-height: 0.8;
 	margin: 0 0 0.25em 0;
 	white-space: nowrap;
+	background: black;
+    padding: 10px;
+    color: white;
+    text-transform: uppercase;
 }
 
 .title--player {

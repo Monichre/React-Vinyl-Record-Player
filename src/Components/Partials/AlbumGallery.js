@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import '../../AlbumGallery.css'
 import Sound from 'react-sound'
+import dynamics from 'dynamics.js'
 
 
 export default class AlbumGallery extends Component {
@@ -21,16 +22,12 @@ export default class AlbumGallery extends Component {
 
 	loadTurntableAssets(callback) {
         
-	
-	};
+	}
     componentDidMount() {
-
-       
 
     }
     setActiveAlbum(album, index) {
         console.log(album)
-        
         document.querySelector('body').classList.add('js')
 
         this.setState({
@@ -47,27 +44,65 @@ export default class AlbumGallery extends Component {
         })
     }
     playThatRecord() {
+        
         this.setState({
             viewSingle: false,
             playTheRecord: true
         })
     }
     playThatSong() {
+        const arm = document.querySelector('.player__element.player__element--tonearm')
+        console.log(arm)
+        
+		
+		dynamics.animate(arm, {
+			rotateZ : 40
+		},{
+			duration: 2000,
+			type: dynamics.spring,
+			frequency: 200,
+			friction: 400
+		});
         this.setState({
             activeSongIs_: 'PLAYING'
         })
     }
-    nextSong() {
+    stopSong() {
 
+        const arm = document.querySelector('.player__element.player__element--tonearm')
+ 		
+		dynamics.animate(arm, {
+			rotateZ : -20
+		},{
+			duration: 2000,
+			type: dynamics.spring,
+			frequency: 200,
+			friction: 400
+		});
+        this.setState({
+            activeSongIs_: 'STOPPED'
+        })
+    }
+    pauseSong() {
+        this.setState({
+            activeSongIs_: 'PAUSED'
+        })
+    }
+    nextSong() {
+        this.setState({
+            counter: this.state.counter += 1
+        })
     }
     previousSong() {
-
+        this.setState({
+            counter: this.state.counter -= 1
+        })
     }
     handleSongLoading(e) {
-        console.log(e)
+        // console.log(e)
     }
     handleSongPlaying(e) {
-        console.log(e)
+        // console.log(e)
     }
     render() {
 
@@ -83,6 +118,7 @@ export default class AlbumGallery extends Component {
         }
 
         console.log(this.state.activeAlbum)
+        console.log(this.state.activeAlbumSongs[this.state.counter])
 
         return (
             <div className="AlbumGallery">
@@ -193,7 +229,7 @@ export default class AlbumGallery extends Component {
                         <ul className="album-grid grid--loaded">
                             {this.props.albums.map((album, i) => (
                                 <li className="grid__item">
-                                    <a className="grid__link" href={`#album-${i + 1}`} onClick={this.setActiveAlbum.bind(this, album, (i + 1))} data-playlist-1="" data-playlist-2="audio/songStolen_Dreams_Backing_Track.mp3">
+                                    <a className="grid__link" href={`#album-${i + 1}`} onClick={this.setActiveAlbum.bind(this, album, (i + 1))}>
                                         <div className="img-wrap img-wrap--grid">
                                             <svg className="lp lp--grid">
                                                 <use xlinkHref="#icon-lp-mini"></use>
@@ -210,7 +246,7 @@ export default class AlbumGallery extends Component {
                     </div>
                     <div className="deco-expander" style={deco_expander_style}></div>
                     <div className={`view view--player ${this.state.playTheRecord ? 'view--current' : ''}`}>
-                        <button className="control-button control-button--back" aria-label="Back to album slideshow">
+                        <button className="control-button control-button--back" aria-label="Back to album slideshow" onClick={this.closeActiveAlbum.bind(this)}>
                             <svg className="icon icon--arrow">
                                 <use xlinkHref="#icon-arrow"></use>
                             </svg>
@@ -218,29 +254,29 @@ export default class AlbumGallery extends Component {
 
                         <div className="player-info">
                             <h2 className="artist artist--player">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h2>
-                            <h3 className="title title--player">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h3>
-                            <span className="year year--player"></span>
+                           
                         </div>
                         <div className="player-stand">
-                            <div className="visualizer"></div>
-                            <span className="song"></span>
+                            
                             <div className="player__controls">
-                                <button className="player-button player-button--rotate" aria-label="Rotate LP">
-                                    <div className="icon icon--rotate">
-                                        <i className="fa fa-2x fa-undo" aria-hidden="true"></i>
-                                    </div>
-                                </button>
-                                <button className="player-button player-button--playstop" aria-label="Play or Stop">
-                                    <div className="icon icon--play icon--hidden" onClick={this.playThatSong.bind(this)}>
+                            <div className="icon icon--play" onClick={this.playThatSong.bind(this)}>
                                         <i className="fa fa-2x fa-play-circle" aria-hidden="true"></i>
                                     </div>
-                                    <div className="icon icon--stop">
+                                    <div className="icon icon--stop" onClick={this.stopSong.bind(this)}>
                                         <i className="fa fa-2x fa-stop-circle" aria-hidden="true"></i>
                                     </div>
-                                </button>
+                                    <div className="icon" onClick={this.nextSong.bind(this)}>
+                                        <i className="fa fa-2x fa-step-forward" aria-hidden="true"></i>
+                                    </div>
+                                    <div className="icon" onClick={this.previousSong.bind(this)}>
+                                        <i className="fa fa-2x fa-step-backward" aria-hidden="true"></i>
+                                    </div>
                             </div>
+                            <span className="number">{this.state.counter}<span className="number__total">{this.state.activeAlbumSongs.length}</span></span>
+                            <h2 className="artist artist--single">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h2>
+                            <h3 className="title title--single">{this.state.activeAlbumSongs.length > 0 ? this.state.activeAlbumSongs[this.state.counter].fields.title : null}</h3>
                         </div>
-                        <div className="player">
+                        <div className={`player ${this.state.activeSongIs_ === 'PLAYING' ? 'player__element--lp-spin' : ''}`}>
                             <div className="player__element player__element--lp">
                                 <div className="player__element-inner">
 
@@ -295,42 +331,24 @@ export default class AlbumGallery extends Component {
                                 />
 
                         </div>
-                        <div className="effects">
-
-                            <button className="effects__button effects__button--vinyleffect effects__button--active" aria-label="Toggle Vinyl effect">
-                                <svg className="icon icon--effect">
-                                    <use xlinkHref="#icon-effect"></use>
-                                </svg>
-                            </button>
-
-                            <div className="effects__irs">
-                                <button className="effects__button">
-                                    <svg className="icon icon--touchthrough icon--ir-cathedral">
-                                        <use xlinkHref="#icon-ir-cathedral"></use>
-                                    </svg>
-                                </button>
-                                <button className="effects__button">
-                                    <svg className="icon icon--touchthrough icon--ir-acoustic">
-                                        <use xlinkHref="#icon-ir-acoustic"></use>
-                                    </svg>
-                                </button>
-                                <button className="effects__button">
-                                    <svg className="icon icon--touchthrough icon--ir-stadium">
-                                        <use xlinkHref="#icon-ir-stadium"></use>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
                     </div>
                     <div className={`view view--single ${this.state.viewSingle ? 'view--current' : ''}`}>
                         <div className={`single ${this.state.viewSingle ? 'single--current' : ''}`} id={this.state.activeIndex ? `album-${this.state.activeIndex}` : null} data-side1="mp3/Stolen_Dreams_Backing_Track.mp3,mp3/Dream_On_This_Side.mp3,mp3/Beautiful_Paranoia.mp3" data-side2="mp3/Rock_On.mp3,mp3/Old_Man_and_the_Sea_II.mp3,mp3/Dawn's_Battle.mp3">
                             <div className="img-wrap img-wrap--single">
                                 <img className="img img--single" src={this.state.activeAlbum ? this.state.activeAlbum.fields.albumPhoto.fields.file.url : null} alt={this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''} />
                             </div>
-                            <span className="number">01<span className="number__total">12</span></span>
+                            <span className="number">{this.state.counter}<span className="number__total">{this.state.activeAlbumSongs.length}</span></span>
                             <h2 className="artist artist--single">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h2>
                             <h3 className="title title--single">{this.state.activeAlbum ? this.state.activeAlbum.fields.albumTitle : ''}</h3>
-                            <span className="year year--single"></span>
+                            <div className="song_list">
+                                <h3>Tracks:</h3>
+                                <div className="song_list_inner">
+                                    {this.state.activeAlbum ? this.state.activeAlbum.fields.songs.map((song) => (
+                                        <p>{song.fields.title}</p>
+                                    )) : null}
+                                </div>
+                            </div>
+                            
                         </div>
                         <div className="controls">
                             <button className="control-button control-button--play" aria-label="Play record" onClick={this.playThatRecord.bind(this)}>
@@ -342,18 +360,6 @@ export default class AlbumGallery extends Component {
                                     <i className="fa fa-2x fa-play-circle" aria-hidden="true"></i>
                                 </div>
                             </button>
-                            <div className="controls__navigate">
-                                <button className="control-button control-button--next" aria-label="Next album">
-                                    <svg className="icon icon--next">
-                                        <use xlinkHref="#icon-next"></use>
-                                    </svg>
-                                </button>
-                                <button className="control-button control-button--prev" aria-label="Previous album">
-                                    <svg className="icon icon--prev">
-                                        <use xlinkHref="#icon-prev"></use>
-                                    </svg>
-                                </button>
-                            </div>
                         </div>
                         <button className="control-button control-button--back" aria-label="Back to grid view" onClick={this.closeActiveAlbum.bind(this)}>
                             <svg className="icon icon--arrow">
@@ -361,9 +367,6 @@ export default class AlbumGallery extends Component {
                             </svg>
                         </button>
                     </div>
-
-
-
 
                 </main>
             </div>
